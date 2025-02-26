@@ -17,6 +17,9 @@ class WebSocketHandler:
             while True:
                 data = await websocket.receive_json()
                 image_b64 = data.get("image")
+                if image_b64.startswith("data:"):
+                    image_b64 = image_b64.split(",", 1)[1]
+                    
                 if not image_b64:
                     await websocket.send_json({"error": "No image provided"})
                     continue
