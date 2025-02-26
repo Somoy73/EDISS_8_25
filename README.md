@@ -2,10 +2,14 @@
 
 Code Repository for EDISS Winter School Hackathon - 2025
 
-## APIs
+## Getting Started
 
-Start API application via `uvicorn`:
+Just run a docker command to start our project.
 
 ```bash
-uvicorn main:app --reload
+docker compose up --build -d
 ```
+
+## API routes
+
+1. `/inference`

@@ -29,7 +29,7 @@ class ObjectDetector:
     def __call__(self, processed_image):
         """
         Run object detection on the processed image.
-        Replace the dummy detections below with your actual model inference.
+        Replace the dummy detections below with our actual model inference.
         """
         detections = [
             {"label": "object1", "confidence": 0.9, "box": [50, 50, 150, 150]},

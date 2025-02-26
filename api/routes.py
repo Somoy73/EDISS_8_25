@@ -10,7 +10,7 @@ class RootHandler:
     def __call__(self):
         return {"message": "Box Detection Service"}
 
-class UploadImageHandler:
+class InferenceHandler:
     def __init__(self, detector: ObjectDetector):
         self.detector = detector
 
@@ -26,12 +26,12 @@ class UploadImageHandler:
         return {"detections": detections}
 
 root_handler = RootHandler()
-upload_image_handler = UploadImageHandler(detector)
+inference_handler = InferenceHandler(detector)
 
 @router.get("/")
 def read_root():
     return root_handler()
 
-@router.post("/upload-image/")
-async def upload_image(file: UploadFile = File(...)):
-    return await upload_image_handler(file)
+@router.post("/inference")
+async def inference(file: UploadFile = File(...)):
+    return await inference_handler(file)
