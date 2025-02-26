@@ -1,4 +1,3 @@
-version: "3.9"
 services:
   api:
     build:
@@ -15,7 +14,7 @@ services:
 # Please set up or let me set up once you complete the front-end part
   # frontend:
   #   build:
-  #     context: ./frontend
+  #     context: ./frontends
   #     dockerfile: Dockerfile
   #   ports:
   #     - "3000:3000"
