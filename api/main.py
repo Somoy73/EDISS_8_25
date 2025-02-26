@@ -1,45 +1,61 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 import base64
 from PIL import Image
+from pydantic import BaseModel
 import io
 
 app = FastAPI()
 
+# ROOT ROUTE
 @app.get("/")
 def read_root():
     return {"EDISS": "Hackathon 2025"}
 
+# Base64 encoded image string
 class ImageRequest(BaseModel):
-    image: str  # Base64 encoded image string
+    image: str  
 
-@app.post("/get_image")
-def image_processing(request: ImageRequest):
-    # Attempt to decode and open the image
+""""
+Load the model here:
+try:
+    model = torch.hub.load('repo', 'name', pretrained=True)
+    # OR LOCAL MODEL
+    model.eval()
+except Exception as e:
+    raise RuntimeError("Failed to load object detection model") from e
+
+"""
+
+# INFERENCE
+@app.websocket("/ws/inference")
+async def websocket_inference(websocket: WebSocket):
+    await websocket.accept()
     try:
-        # Decode the base64 string to binary image data
-        image_data = base64.b64decode(request.image)
-        image = Image.open(io.BytesIO(image_data))
-    except Exception as e:
-        # Return a 400 error if decoding fails or image cannot be opened
-        raise HTTPException(status_code=400, detail="Invalid image data") from e
+        while True:
+            # Expect a JSON message with the base64 encoded image
+            data = await websocket.receive_json()
+            image_base64 = data.get("image")
+            if not image_base64:
+                await websocket.send_json({"error": "No image provided"})
+                continue
 
-    # Process the image: convert it to grayscale
-    try:
-        processed_image = image.convert("L")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Error processing image") from e
+            # Decode the image
+            try:
+                image_data = base64.b64decode(image_base64)
+                pil_image = Image.open(io.BytesIO(image_data)).convert("RGB")
+            except Exception as e:
+                await websocket.send_json({"error": "Invalid image data"})
+                continue
 
-    # Save the processed image to an in-memory bytes buffer in PNG format
-    buffered = io.BytesIO()
-    try:
-        processed_image.save(buffered, format="PNG")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Error saving processed image") from e
+            # Run inference 
+            try:
+                # results = model(pil_image) # PASS IMAGE TO MODEL
+                detections = "WAITING FOR MODEL"
+            except Exception as e:
+                await websocket.send_json({"error": "Error during model inference"})
+                continue
 
-    buffered.seek(0)
-    
-    # Encode the processed image back to base64 for response
-    processed_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
-    
-    return {"processed_image": processed_image_base64}
+            # Send back the detections as JSON
+            await websocket.send_json({"detections": detections})
+    except WebSocketDisconnect:
+        print("Client disconnected")
