@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, logger
-from PIL import Image
+from PIL import Image, ImageDraw
 import io
 import base64
 from box_detector import ObjectDetector
@@ -57,3 +57,42 @@ websocket_handler = WebSocketHandler(detector)
 async def websocket_endpoint(websocket: WebSocket):
     logger.info("WebSocket endpoint called")
     await websocket_handler(websocket)
+
+@websocket_router.websocket("/ws/image")
+async def image_websocket_endpoint(websocket: WebSocket):
+    logger.info("Image WebSocket endpoint called")
+    await websocket.accept()
+    try:
+        while True:
+            # Receive any message from frontend to trigger image generation
+            await websocket.receive_text()
+            logger.info("Received request for test image")
+            
+            try:
+                # Generate a test image
+                width, height = 300, 200
+                image = Image.new('RGB', (width, height), color='white')
+                # Draw something on it to make it unique
+                draw = ImageDraw.Draw(image)
+                draw.rectangle(
+                    [(50, 50), (width-50, height-50)],
+                    outline='blue',
+                    width=5
+                )
+                draw.text((100, 80), "Test Image", fill="red")
+                logger.info("Created test image")
+                
+                # Convert image to base64
+                buffer = io.BytesIO()
+                image.save(buffer, format="JPEG")
+                img_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                
+                # Send the image back to frontend
+                await websocket.send_json({"image": f"data:image/jpeg;base64,{img_str}"})
+            except Exception as e:
+                logger.error(f"Error generating test image: {str(e)}")
+                await websocket.send_json({"error": str(e)})
+    except WebSocketDisconnect:
+        logger.info(f"Image WebSocket client {websocket.client} disconnected")
+    except Exception as e:
+        logger.error(f"Image WebSocket error: {str(e)}")
