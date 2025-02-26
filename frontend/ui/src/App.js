@@ -11,7 +11,7 @@ function App() {
       {/* Main Content */}
       <Container sx={{ minHeight: "83vh", py: 3 }}>
         <Typography variant="h4" sx={{ marginBottom: "10px" }}>
-          Max Box Layers On Pellet{" "}
+          HEY{" "}
         </Typography>
         <VideoInput width={400} height={300} />
       </Container>

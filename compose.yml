@@ -7,7 +7,6 @@ services:
     volumes:
       - ./api:/app
 
-
 # Please set up or let me set up once you complete the front-end part
   # frontend:
   #   build:
