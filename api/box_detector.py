@@ -1,38 +1,42 @@
-from PIL import Image
+from ultralytics import YOLO
 import numpy as np
-import cv2 # Based on our 
-# import torch
+from PIL import Image
 
 class ObjectDetector:
-    def __init__(self, model_name=None):
-        # load  model here
-        # Select device: GPU if available, else CPU
-        # self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # Load the model from torch.hub and move it to the selected device
-        # self.model = torch.hub.load('ultralytics/yolov5', model_name, pretrained=True).to(self.device) # Load our Model
-        
-        # self.model.eval()  # Set model to evaluation mode
-        pass
+    def __init__(self, model_path="best.pt"):
+        # Load the YOLO model
+        self.model = YOLO(model_path)
 
-    def process_image(self, pil_image: Image.Image):
+    def __call__(self, image):
+        """
+        Run object detection on the image.
+        The image can be a PIL Image, a NumPy array, or a file path.
+        YOLO will handle resizing and normalization internally.
+        """
+        # If the image is a PIL Image, convert it to a NumPy array
+        if isinstance(image, Image.Image):
+            image = np.array(image)
         
-        # Waiting for our step
-        """
-        Convert a PIL image to a normalized NumPy array.
-        Resize the image to 640x480.
-        """
-        image_array = np.array(pil_image)
-        resized = cv2.resize(image_array, (640, 480))
-        normalized = resized.astype("float32") / 255.0
-        return normalized
+        # Run inference (wrap the image in a list for batched inference)
+        results = self.model([image])
+        detections = []
 
-    def __call__(self, processed_image):
-        """
-        Run object detection on the processed image.
-        Replace the dummy detections below with our actual model inference.
-        """
-        detections = [
-            {"label": "object1", "confidence": 0.9, "box": [50, 50, 150, 150]},
-            {"label": "object2", "confidence": 0.8, "box": [200, 100, 300, 300]}
-        ]
+        # Extract detection results from the first result in the batch
+        if results and results[0].boxes is not None:
+            boxes = results[0].boxes
+            for i in range(len(boxes.xyxy)):
+                coords = boxes.xyxy[i].tolist()  # [x1, y1, x2, y2]
+                conf = float(boxes.conf[i])
+                cls = int(boxes.cls[i])
+                detection = {
+                    "label": str(cls),   # Replace with actual label mapping if needed
+                    "confidence": conf,
+                    "box": coords
+                }
+                detections.append(detection)
+            
+            # Optionally, you can display or save the result image:
+            results[0].show()
+            results[0].save(filename="result.jpg")
+        
         return detections
