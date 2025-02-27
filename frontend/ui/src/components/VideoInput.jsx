@@ -8,7 +8,7 @@ export default function VideoInput(props) {
   const [wsResponses, setWsResponses] = useState([]); // holds responses from WebSocket
   const wsRef = useRef(null);
   const websocket_url = "ws://localhost:8000/ws";
-  const test_ws_url = "ws://localhost:8000/ws/image"
+  const test_ws_url = "ws://localhost:8000/ws/image";
 
   // Establish a WebSocket connection on mount
   useEffect(() => {
@@ -89,7 +89,9 @@ export default function VideoInput(props) {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <IconButton
         component="label"
         sx={{
@@ -109,18 +111,32 @@ export default function VideoInput(props) {
           onChange={handleFileChange}
         />
       </IconButton>
-      <Typography variant="sm" sx={{ width: "auto", fontSize: source ? "16px" : "22px" }}>
+      <Typography
+        variant="sm"
+        sx={{ width: "auto", fontSize: source ? "16px" : "22px" }}
+      >
         {source ? "Select a new video" : "Choose a video to process"}
       </Typography>
 
       {source && (
-        <Box sx={{ margin: "25px auto", display: "flex", justifyContent: "center" }}>
-          <video className="VideoInput_video" height={height} controls src={source} />
+        <Box
+          sx={{
+            margin: "25px auto",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <video
+            className="VideoInput_video"
+            height={height}
+            controls
+            src={source}
+          />
         </Box>
       )}
 
-{/* Only geenrate first image for debugging */}
-{/* {wsResponses.length > 0 && (
+      {/* Only geenrate first image for debugging */}
+      {/* {wsResponses.length > 0 && (
   <Box sx={{ marginTop: "20px", width: "80%" }}>
     <Typography variant="h6" sx={{ marginBottom: "10px" }}>
       Detection Result:
@@ -144,25 +160,25 @@ export default function VideoInput(props) {
   </Box>
 )} */}
 
-{/* Testing generated image from detection */}
-{wsResponses.length > 0 && (
+      {/* Testing generated image from detection */}
+      {wsResponses.length > 0 && (
         <Box sx={{ marginTop: "20px", width: "80%" }}>
-            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
-              Detection Result:
-            </Typography>
-              {wsResponses.map((response, index) => (
-                <Box
-                key={index}               
-                sx={{
-                  backgroundColor: "#f0f0f0",
-                  padding: "10px",
-                  margin: "10px 0",
-                  borderRadius: "4px",
-                  display: "flex",
-                  justifyContent: "center",
+          <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+            Detection Result:
+          </Typography>
+          {wsResponses.map((response, index) => (
+            <Box
+              key={index}
+              sx={{
+                backgroundColor: "#f0f0f0",
+                padding: "10px",
+                margin: "10px 0",
+                borderRadius: "4px",
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              <img 
+              <img
                 src={response.image}
                 alt={`response-${index}`}
                 style={{ maxWidth: "100%" }}
@@ -171,7 +187,6 @@ export default function VideoInput(props) {
           ))}
         </Box>
       )}
-
     </Box>
   );
 }

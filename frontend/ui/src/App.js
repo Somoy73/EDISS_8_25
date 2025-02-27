@@ -3,6 +3,9 @@ import VideoInput from "./components/VideoInput";
 import Button from "@mui/material/Button";
 import { AppBar, Toolbar, Typography, Container, Box } from "@mui/material";
 import CustomAppBar from "./components/CustomAppBar";
+import { BrowserRouter, Routes, Route } from "react-router";
+import VideosTable from "./components/VideosTable";
+
 function App() {
   return (
     <>
@@ -10,10 +13,10 @@ function App() {
 
       {/* Main Content */}
       <Container sx={{ minHeight: "83vh", py: 3 }}>
-        <Typography variant="h4" sx={{ marginBottom: "10px" }}>
-          HEY{" "}
-        </Typography>
-        <VideoInput width={400} height={300} />
+        <Routes>
+          <Route path="/" element={<VideoInput width="30%" />} />
+          <Route path="/table" element={<VideosTable />} />
+        </Routes>
       </Container>
 
       {/* Footer */}
