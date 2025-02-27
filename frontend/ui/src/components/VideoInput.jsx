@@ -1,8 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  createContext,
+  useContext,
+} from "react";
+import { Box, Typography, IconButton, Button } from "@mui/material";
 import { FileUploadOutlined } from "@mui/icons-material";
+import { useData } from "../hooks/DataContext";
+import FullPageLoader from "./FullPageLoader";
+import { useNavigate } from "react-router";
 
 export default function VideoInput(props) {
+  let navigate = useNavigate();
+  const { data, setData } = useData();
+  const [loading, setLoading] = useState(false);
+  const [url, setUrl] = useState(null);
   const { width, height } = props;
   const [source, setSource] = useState(null);
   const [wsResponses, setWsResponses] = useState([]); // holds responses from WebSocket
@@ -40,10 +53,20 @@ export default function VideoInput(props) {
     const file = event.target.files[0];
     const url = URL.createObjectURL(file);
     setSource(url);
-    processVideo(url);
+    setUrl(url);
   };
 
   const processVideo = (videoUrl) => {
+    setLoading(true);
+    let currentData = {
+      timestamp: new Date().toISOString(),
+      videoUrl: videoUrl,
+      danger: Math.random() > 0.5 ? true : false,
+    };
+
+    console.log(data);
+    setData([...data, currentData]);
+
     const video = document.createElement("video");
     video.src = videoUrl;
     video.crossOrigin = "anonymous";
@@ -86,57 +109,84 @@ export default function VideoInput(props) {
 
       captureFrame();
     };
+
+    setTimeout(() => {
+      setLoading(false);
+      navigate("/table");
+    }, 2000);
   };
 
   return (
-    <Box
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
-      <IconButton
-        component="label"
-        sx={{
-          marginBottom: "12px",
-          marginLeft: "10px",
-          marginTop: source ? "0" : "100px",
-          color: "#559c8b",
-          backgroundColor: "#559c8b10",
-          "&:hover": { background: "#559c8b70" },
-        }}
-      >
-        <FileUploadOutlined sx={{ fontSize: source ? "40px" : "60px" }} />
-        <input
-          type="file"
-          accept=".mov,.mp4"
-          hidden
-          onChange={handleFileChange}
-        />
-      </IconButton>
-      <Typography
-        variant="sm"
-        sx={{ width: "auto", fontSize: source ? "16px" : "22px" }}
-      >
-        {source ? "Select a new video" : "Choose a video to process"}
+    <>
+      <Typography variant="h4" sx={{ marginBottom: "20px" }}>
+        Video Analysis{" "}
       </Typography>
-
-      {source && (
-        <Box
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        {loading && <FullPageLoader />}
+        <IconButton
+          component="label"
           sx={{
-            margin: "25px auto",
-            display: "flex",
-            justifyContent: "center",
+            marginBottom: "12px",
+            marginLeft: "10px",
+            marginTop: source ? "0" : "100px",
+            color: "#559c8b",
+            backgroundColor: "#559c8b10",
+            "&:hover": { background: "#559c8b70" },
           }}
         >
-          <video
-            className="VideoInput_video"
-            height={height}
-            controls
-            src={source}
+          <FileUploadOutlined sx={{ fontSize: source ? "40px" : "60px" }} />
+          <input
+            type="file"
+            accept=".mov,.mp4"
+            hidden
+            onChange={handleFileChange}
           />
-        </Box>
-      )}
+        </IconButton>
+        <Typography
+          variant="sm"
+          sx={{ width: "auto", fontSize: source ? "16px" : "22px" }}
+        >
+          {source ? "Select a new video" : "Choose a video to process"}
+        </Typography>
 
-      {/* Only geenrate first image for debugging */}
-      {/* {wsResponses.length > 0 && (
+        {source && (
+          <Box
+            sx={{
+              margin: "25px auto",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <video
+              className="VideoInput_video"
+              height={height}
+              controls
+              src={source}
+              width={width}
+            />
+
+            <Button
+              onClick={() => processVideo(url)}
+              sx={{
+                backgroundColor: "#559c8b",
+                color: "white",
+                fontWeight: "bold",
+                padding: "10px 20px",
+                marginTop: "20px",
+              }}
+            >
+              {" "}
+              Process Video{" "}
+            </Button>
+          </Box>
+        )}
+
+        {/* Only geenrate first image for debugging */}
+        {/* {wsResponses.length > 0 && (
   <Box sx={{ marginTop: "20px", width: "80%" }}>
     <Typography variant="h6" sx={{ marginBottom: "10px" }}>
       Detection Result:
@@ -160,33 +210,34 @@ export default function VideoInput(props) {
   </Box>
 )} */}
 
-      {/* Testing generated image from detection */}
-      {wsResponses.length > 0 && (
-        <Box sx={{ marginTop: "20px", width: "80%" }}>
-          <Typography variant="h6" sx={{ marginBottom: "10px" }}>
-            Detection Result:
-          </Typography>
-          {wsResponses.map((response, index) => (
-            <Box
-              key={index}
-              sx={{
-                backgroundColor: "#f0f0f0",
-                padding: "10px",
-                margin: "10px 0",
-                borderRadius: "4px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src={response.image}
-                alt={`response-${index}`}
-                style={{ maxWidth: "100%" }}
-              />
-            </Box>
-          ))}
-        </Box>
-      )}
-    </Box>
+        {/* Testing generated image from detection */}
+        {wsResponses.length > 0 && (
+          <Box sx={{ marginTop: "20px", width: "80%" }}>
+            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+              Detection Result:
+            </Typography>
+            {wsResponses.map((response, index) => (
+              <Box
+                key={index}
+                sx={{
+                  backgroundColor: "#f0f0f0",
+                  padding: "10px",
+                  margin: "10px 0",
+                  borderRadius: "4px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <img
+                  src={response.image}
+                  alt={`response-${index}`}
+                  style={{ maxWidth: "100%" }}
+                />
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+    </>
   );
 }

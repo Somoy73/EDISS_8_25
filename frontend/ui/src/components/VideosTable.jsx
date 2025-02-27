@@ -11,6 +11,8 @@ import {
   Icon,
 } from "@mui/material";
 
+import { useData } from "../hooks/DataContext";
+
 import VideoTableDialog from "./VideoTableDialog";
 
 // Sample data
@@ -43,15 +45,19 @@ const sampleData = [
 ];
 
 const VideosTable = () => {
+  const { data } = useData();
   return (
     <>
       <Typography variant="h4" sx={{ marginBottom: "20px" }}>
-        Max Box Layers On Pellet Logs{" "}
+        Video Analysis Logs{" "}
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead sx={{ backgroundColor: "#559c8b" }}>
             <TableRow>
+              <TableCell sx={{ color: "white", fontSize: "16px" }}>
+                <b>Index</b>
+              </TableCell>
               <TableCell sx={{ color: "white", fontSize: "16px" }}>
                 <b>Date</b>
               </TableCell>
@@ -67,20 +73,32 @@ const VideosTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sampleData.map((row, index) => (
+            {data.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.status}</TableCell>
-                <TableCell>{row.description}</TableCell>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{row.timestamp}</TableCell>
+
+                <TableCell>Processed ✅</TableCell>
+                <TableCell>
+                  {row.danger
+                    ? "Danger 🚨 Misuse Of Company Equipment Detected ⚠️"
+                    : "Correct ✅ Usage of Company Detected 👍"}
+                </TableCell>
                 <TableCell sx={{ textAlign: "right" }}>
-                  {" "}
-                  <VideoTableDialog />
+                  <VideoTableDialog danger={row.danger} time={row.timestamp} />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <Typography variant="h6" sx={{ marginTop: "20px" }}>
+        {data.filter((row) => row.danger).length > 0
+          ? ` ⚠️ There are ${
+              data.filter((row) => row.danger).length
+            } instance(s) of misuse of company equipment detected. ⚠️`
+          : "No misuse of company equipment has been detected. ✅"}
+      </Typography>
     </>
   );
 };
