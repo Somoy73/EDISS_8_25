@@ -1,0 +1,47 @@
+name: ediss-dev
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    develop:
+      watch:
+        - path: ./api
+          action: sync
+          target: /app
+        - path: ./api/requirements.txt
+          action: rebuild
+
+  frontend:
+    build:
+      context: ./frontend/ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=0
+    develop:
+      watch:
+        - path: ./frontend/ui/src
+          action: sync
+          target: /app/src
+        - path: ./frontend/ui/public
+          action: sync
+          target: /app/public
+        - path: ./frontend/ui/package.json
+          action: rebuild
+    stdin_open: true
+    tty: true
+    depends_on:
+      - api

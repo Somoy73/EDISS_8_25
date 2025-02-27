@@ -2,20 +2,15 @@ services:
   api:
     build:
       context: ./api
-      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./api:/app
-    environment:
-      - PYTHONUNBUFFERED=1
-
 
 # Please set up or let me set up once you complete the front-end part
   # frontend:
   #   build:
   #     context: ./frontends
-  #     dockerfile: Dockerfile
   #   ports:
   #     - "3000:3000"
   #   volumes:
