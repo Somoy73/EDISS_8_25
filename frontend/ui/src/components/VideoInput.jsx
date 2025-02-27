@@ -71,6 +71,9 @@ export default function VideoInput(props) {
 
   return (
     <>
+      <Typography variant="h4" sx={{ marginBottom: "10px" }}>
+        Max Box Layers On Pellet{" "}
+      </Typography>
       <Box
         sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
@@ -118,7 +121,7 @@ export default function VideoInput(props) {
         >
           <video
             className="VideoInput_video"
-            height={height}
+            width={width}
             controls
             src={source}
           />
@@ -136,6 +139,8 @@ export default function VideoInput(props) {
               margin: "0 auto",
               display: "block",
               fontWeight: "bold",
+              textTransform: "none",
+              fontSize: "17px",
             }}
           >
             Process Video

@@ -16,6 +16,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import AptarLogo from "../images/AptarLogo.svg";
+import { NavLink } from "react-router";
 
 export default function CustomAppBar() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -81,6 +82,11 @@ export default function CustomAppBar() {
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
+        <NavLink to="/table" color="red">
+          Logs
+        </NavLink>
+      </MenuItem>
+      <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon />
@@ -122,39 +128,44 @@ export default function CustomAppBar() {
           <Box textAlign="center" sx={{ paddingTop: "10px" }}>
             <img src={AptarLogo} alt="Logo" width="150" />
           </Box>
-
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              sx={{ color: "gray" }}
+          <Box
+            sx={{
+              display: "flex",
+              gap: "20px",
+              justifyContent: "flex-end",
+              width: "100%",
+            }}
+          >
+            <NavLink
+              to="/"
+              style={{
+                textDecoration: "none",
+                color: "black",
+                padding: "10px 20px",
+                borderRadius: "5px",
+              }}
+              activeStyle={{
+                color: "gray",
+              }}
             >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              sx={{ color: "gray" }}
+              <Typography sx={{ fontWeight: "bold" }}>Process Video</Typography>
+            </NavLink>
+            <NavLink
+              to="/table"
+              style={{
+                textDecoration: "none",
+                color: "black",
+                padding: "10px 20px",
+                borderRadius: "5px",
+              }}
+              activeStyle={{
+                color: "gray",
+              }}
             >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              sx={{ color: "gray" }}
-            >
-              <AccountCircle />
-            </IconButton>
+              <Typography sx={{ fontWeight: "bold" }}>Video Logs</Typography>
+            </NavLink>
           </Box>
+
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
