@@ -1,0 +1,19 @@
+services:
+  api:
+    build:
+      context: ./api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+
+# Please set up or let me set up once you complete the front-end part
+  # frontend:
+  #   build:
+  #     context: ./frontends
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #   environment:
+  #     - NODE_ENV=development
