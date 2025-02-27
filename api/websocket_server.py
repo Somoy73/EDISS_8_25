@@ -24,7 +24,7 @@ class WebSocketHandler:
             while True:
                 data = await websocket.receive_json()
                 logger.info(f"Received data: {data.keys()}")
-                image_b64 = data.get("image")
+                image_b64 = data["data"]
                 if image_b64.startswith("data:"):
                     image_b64 = image_b64.split(",", 1)[1]
                     
