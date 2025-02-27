@@ -23,7 +23,6 @@ class WebSocketHandler:
         try:
             while True:
                 data = await websocket.receive_json()
-                logger.info(f"Received data: {data.keys()}")
                 image_b64 = data["data"]
                 if image_b64.startswith("data:"):
                     image_b64 = image_b64.split(",", 1)[1]
@@ -42,8 +41,7 @@ class WebSocketHandler:
                     await websocket.send_json({"error": "Invalid image data"})
                     continue
 
-                processed = self.detector.process_image(pil_image)
-                detections = self.detector(processed)
+                detections = self.detector(pil_image)
                 logger.info(f"Detections: {detections}")
                 await websocket.send_json({"detections": detections})
         except WebSocketDisconnect:
